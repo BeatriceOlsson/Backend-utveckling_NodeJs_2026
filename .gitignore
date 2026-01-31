@@ -1,0 +1,9 @@
+# Ingnorerar känsliga filer och mappar som ine bör inkluderas i versionskontrollen
+node_modules
+.env
+
+logs
+*.log
+
+.DS_Store
+Thumbs.db

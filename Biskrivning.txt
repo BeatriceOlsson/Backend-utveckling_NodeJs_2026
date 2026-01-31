@@ -1,0 +1,188 @@
+Projektarbete: Bygga en Bokningsplattform för en Coworking Space
+
+Översikt
+I detta projekt ska du bygga backend för en Bokningsplattform för en Coworking Space. Plattformen ska låta användare registrera sig, logga in, och boka arbetsplatser eller konferensrum. Administratörer ska kunna hantera användare, rum och bokningar.
+
+Funktionella krav
+1. Användarroller
+
+ • Vanlig användare (User):
+
+ • Kan registrera sig, logga in och se sina bokningar.
+
+ • Kan skapa, uppdatera och ta bort sina egna bokningar.
+
+ • Administratör (Admin):
+
+ • Kan hantera rum (lägga till, uppdatera och ta bort).
+
+ • Kan se alla användare och deras bokningar.
+
+ • Kan hantera användare (ta bort användarkonton).
+
+2. Funktionalitet
+
+ 1. Autentisering och Auktorisering
+
+ • Användare ska kunna registrera sig och logga in via API:et.
+
+ • JWT ska användas för att autentisera och skydda rutter.
+
+ • Endast admin ska kunna hantera rum och andra användare.
+
+ 2. Rumshantering
+
+ • Admin ska kunna skapa rum med följande fält:
+
+ • Namn (t.ex., “Konferensrum 1”).
+
+ • Kapacitet (antal personer rummet rymmer).
+
+ • Typ (t.ex., “arbetsplats” eller “konferensrum”).
+
+ 3. Bokningar
+
+ • En användare ska kunna boka ett rum genom att ange:
+
+ • Rum-ID.
+
+ • Datum och tid för bokningen (start och slut).
+
+ • Systemet ska kontrollera att rummet är ledigt innan bokningen sparas.
+
+ 4. Notifieringar
+
+ • Skicka realtidsnotifieringar till användare när en bokning skapas eller ändras.
+
+ 5. Loggning och Felhantering
+
+ • Implementera loggning för att övervaka systemet.
+
+ • Hantera vanliga fel som att boka ett upptaget rum eller ange ogiltiga datum.
+
+
+Teknikstack
+
+ • Backend: Node.js med Express.js.
+
+ • Databas
+
+ • Autentisering: JWT och bcrypt.
+
+ • Caching: Redis för att optimera hantering av ofta efterfrågade data (t.ex., rum).
+
+ • Realtidskommunikation: WebSocket (via socket.io) för notifieringar.
+
+ • Deployment: Heroku eller annan molnplattform.
+
+
+Projektkrav
+
+1. API-specifikation
+
+ • Autentisering
+
+ • POST /register: Registrera en ny användare.
+
+ • POST /login: Logga in och få en JWT-token.
+
+ • Rumshantering (Endast Admin)
+
+ • POST /rooms: Skapa ett nytt rum.
+
+ • GET /rooms: Hämta en lista över alla rum.
+
+ • PUT /rooms/:id: Uppdatera ett rum.
+
+ • DELETE /rooms/:id: Ta bort ett rum.
+
+ • Bokningar
+
+ • POST /bookings: Skapa en ny bokning.
+
+ • GET /bookings: Hämta användarens bokningar (User) eller alla bokningar (Admin).
+
+ • PUT /bookings/:id: Uppdatera en bokning (endast skaparen eller Admin).
+
+ • DELETE /bookings/:id: Ta bort en bokning (endast skaparen eller Admin).
+
+ • Notifieringar
+
+ • Implementera realtidsnotifieringar när:
+
+ • En bokning skapas.
+
+ • En bokning ändras eller tas bort.
+
+
+2. Databasstruktur
+
+ • Users
+const userSchema = new mongoose.Schema({
+  username: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  role: { type: String, enum: ['User', 'Admin'], default: 'User' },
+});
+
+ • Rooms
+const roomSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  capacity: { type: Number, required: true },
+  type: { type: String, enum: ['workspace', 'conference'], required: true },
+});
+
+ • Bookings
+const bookingSchema = new mongoose.Schema({
+  roomId: { type: mongoose.Schema.Types.ObjectId, ref: 'Room', required: true },
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  startTime: { type: Date, required: true },
+  endTime: { type: Date, required: true },
+});
+
+
+Leverabler
+
+ 1. Kod
+
+ • Projektets kod organiserad enligt en modulär struktur.
+
+ • En Git-repo-länk eller en zip-fil med hela projektet.
+
+ 2. Dokumentation
+
+ • README.md med:
+
+ • Kort beskrivning av projektet.
+
+ • Instruktioner för att köra projektet lokalt.
+
+ • API-dokumentation (rutter, metoder, förfrågningskroppar, och svar).
+
+ 3. Deployad Applikation
+
+ • En publik URL till den deployade applikationen (t.ex., Heroku).
+
+
+
+
+Bedömningskriterier
+
+ 1. Funktionalitet (50%)
+
+ • Uppfyller alla krav (autentisering, RBAC, bokningslogik, etc.).
+
+ • Realtidsnotifieringar fungerar korrekt.
+
+ 2. Kodkvalitet (20%)
+
+ • Ren, läsbar och välstrukturerad kod.
+
+ • Följande av best practices för Node.js och Express.
+
+ 3. Dokumentation (10%)
+
+ • README-filen är tydlig och informativ.
+
+ 4. Deployment (20%)
+
+ • Applikationen är korrekt deployad och tillgänglig online.
