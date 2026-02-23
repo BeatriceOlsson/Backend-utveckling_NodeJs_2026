@@ -1,0 +1,3 @@
+
+
+//kontrolerar rollen på användaren
