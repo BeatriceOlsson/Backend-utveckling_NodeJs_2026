@@ -9,7 +9,7 @@ const saltNumber = parseInt(process.env.SALT_ROUNDS)|| 10;
 const usersSchema = new mongoose.Schema({
     userName: {type: String, unique:true, required: true},
     password: {type: String, required: true},
-    role: {type: String, enum: ["User", "Admin"], default: "user"}
+    role: {type: String, enum: ["user", "admin"], default: "user"}
 })
 
 //Pre-save hook som körs innan en användare sparas i databasen. Denna hook hash:ar lösenordet med bcrypt innan det sparas, vilket ökar säkerheten genom att inte lagra lösenord i klartext.
