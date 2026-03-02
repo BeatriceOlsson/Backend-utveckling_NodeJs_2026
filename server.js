@@ -3,6 +3,8 @@ import dotenv from 'dotenv';
 import logger from './middleware/logger.js';
 import connectToMongoDB from './config/db.js';
 import roomsRouter from './routes/rooms.js';
+import bookingsRouter from './routes/booking.js';
+
 //läser in .env-filen och gör variablerna tillgängliga i process.env
 dotenv.config();
 
@@ -16,7 +18,7 @@ app.use(express.json());
 app.use(logger);
 
 app.use('/rooms', roomsRouter);
-//app.use('/bookings', bookingsRouter);//skappa router
+app.use('/bookings', bookingsRouter);//skappa router
 //app.use('/admin', adminRouter);//skappa router
 
 app.get('/', (req, res) => {
