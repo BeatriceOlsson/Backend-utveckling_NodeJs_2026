@@ -23,10 +23,6 @@ router.post('/rooms', async (req, res) => {
     try {
         const newRoom = await room.save();
     }
-
-    rooms.push(newRoom);
-    res.status(201).json(newRoom);
-    
 })
 
 //Uppdaterar ett rum
