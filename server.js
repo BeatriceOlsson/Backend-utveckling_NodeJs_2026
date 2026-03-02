@@ -15,7 +15,9 @@ const app = express();
 app.use(express.json());
 app.use(logger);
 
-app.use(roomsRouter);
+app.use('/rooms', roomsRouter);
+//app.use('/bookings', bookingsRouter);//skappa router
+//app.use('/admin', adminRouter);//skappa router
 
 app.get('/', (req, res) => {
     res.send('Välkommen till min Express-server!');
