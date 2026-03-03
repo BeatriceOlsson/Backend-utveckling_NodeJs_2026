@@ -21,6 +21,12 @@ app.use('/rooms', roomsRouter);
 app.use('/bookings', bookingsRouter);//skappa router
 //app.use('/admin', adminRouter);//skappa router
 
+//Felhantering - fångar alla fel som uppstår i applikationen och skickar en generisk felmeddelande till klienten, samtidigt som det loggar det faktiska felet i serverns konsol. Detta hjälper till att hålla klienten informerad om att något gick fel utan att avslöja känslig information om servern.
+app.use((err, req, res, next) => {
+    console.error(`Ett fel uppstod: ${err.message}`);
+    res.status(500).send('Ett fel uppstod på servern');
+})
+
 app.get('/', (req, res) => {
     res.send('Välkommen till min Express-server!');
 });
@@ -29,10 +35,4 @@ app.get('/', (req, res) => {
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
     console.log(`Servern körs på port ${port}`);
-})
-
-//Felhantering - fångar alla fel som uppstår i applikationen och skickar en generisk felmeddelande till klienten, samtidigt som det loggar det faktiska felet i serverns konsol. Detta hjälper till att hålla klienten informerad om att något gick fel utan att avslöja känslig information om servern.
-app.use((err, req, res, next) => {
-    console.error(`Ett fel uppstod: ${err.message}`);
-    res.status(500).send('Ett fel uppstod på servern');
 })

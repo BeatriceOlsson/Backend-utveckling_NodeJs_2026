@@ -24,6 +24,16 @@ usersSchema.pre('save', async function (next) {
     }
 })
 
+//Metod för att jämföra givet lösenord med det hachade lösenordet.
+usersSchema.methods.comparePassword = async function(candidatePassword) {
+    try {
+        //bcrypt.compare tar det givna lösenordet och det hachade lösenordet och returnerar true om de matchar, annars false.
+        return await bcrypt.compare(candidatePassword, this.password);
+    } catch (err) {
+        throw err;
+    }
+}
+
 const User = mongoose.model('User', usersSchema);
 
 export default User;

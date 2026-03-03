@@ -1,6 +1,7 @@
 import express from 'express';
-import Booking from '../models/booking.js';
-import { verifyJWTToken, verifyAdminRole } from '../middleware/auth.js';
+import Booking from '../models/booking.models.js';
+import Room from '../models/room.models.js';
+import { verifyJWTToken } from '../middleware/jwt.middleware.js';
 
 const router = express.Router();
 
@@ -8,7 +9,7 @@ const router = express.Router();
 router.get('/', verifyJWTToken, async (req, res) => {
     if (req.user.role === 'admin') {
         try {//.populate används för att hämta data från de länkande dokumenet
-            const bookings = await Booking.find().populate('roomId', 'userId');
+            const bookings = await Booking.find().populate('roomId').populate('userId', 'userName');
             return res.status(200).json(bookings);
         } catch (err) {
             return res.status(500).json({ message: err.message });
@@ -26,26 +27,27 @@ router.get('/', verifyJWTToken, async (req, res) => {
 //Skappa en booking och sparar den i databasen tillsamans med kontroller
 router.post('/', verifyJWTToken, async (req, res) => {
     try {
+        const {roomId, startTime, endTime} = req.body;
         //kollar att al nödvändiga fält finns i request body
-        if (!req.body.roomId || !req.user.id || !req.body.startTime || !req.body.endTime) {
+        if (!roomId || !req.user.id || !startTime || !endTime) {
             return res.status(400).json({ message: 'Missing required fields' });
         }
 
-        const room = await Room.findById(req.body.roomId);
+        const room = await Room.findById(roomId);
         if (!room) {
             return res.status(400).json({ message: 'Rum existerar inte' });
         }
 
         //kollar att startTime är innan endTime
-        if (new Date(req.body.startTime) >= new Date(req.body.endTime)) {
+        if (new Date(startTime) >= new Date(endTime)) {
             return res.status(400).json({ message: 'Start time must be before end time' });
         }
         //kollar att det inte finns en booking som överlappar med den nya bookingen
         const overlapingBooking = await Booking.findOne({
-            roomId: req.body.roomId,
+            roomId: roomId,
             //Les Then= $lt, Greater Then= $gt istället för startTime < endTime
-            startTime: { $lt: req.body.endTime },
-            endTime: { $gt: req.body.startTime }
+            startTime: { $lt: endTime },
+            endTime: { $gt: startTime }
         })
 
         if (overlapingBooking) {
@@ -54,17 +56,20 @@ router.post('/', verifyJWTToken, async (req, res) => {
 
         //Om alla kontroller är godkända, skapa en ny booking
         const booking = new Booking({
-            roomId: req.body.roomId,
+            roomId: roomId,
             userId: req.user.id,
-            startTime: req.body.startTime,
-            endTime: req.body.endTime
+            startTime: startTime,
+            endTime: endTime
         });
 
         //Spara bookingen i databasen
-        const saveBooking = (await booking.save()).populate('roomId');
-        return res.status(201).json(saveBooking);
+        await booking.save();
+        const savedBooking = await Booking.findById(booking._id).populate('roomId').populate('userId', 'userName');
+        return res.status(201).json(savedBooking);
 
     } catch (err) {
         return res.status(500).json({ message: err.message });
     }
 });
+
+export default router;
