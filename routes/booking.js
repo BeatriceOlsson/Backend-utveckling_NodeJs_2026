@@ -72,4 +72,74 @@ router.post('/', verifyJWTToken, async (req, res) => {
     }
 });
 
+//Uppdatera booking,användare kan uppdatera sin bokning admin kan uppdatera alla.
+router.put('/:id', verifyJWTToken, async (req, res) => {
+    try {
+        const { roomId, startTime, endTime } = req.body;
+        const bookingToChange = await Booking.findById(req.params.id);
+        
+        //kollar att det fins en bokning och data som behövs.
+        if (!bookingToChange) {
+            return res.status(404).json({ message: 'Booking not found' });
+        }
+        if (!roomId || !startTime || !endTime) {
+            return res.status(400).json({ message: 'Missing required fields' });
+        }
+
+        if (new Date(startTime) >= new Date(endTime)) {
+            return res.status(400).json({ message: 'Start time must be before end time' });
+        }
+
+        //kontrolerar överlapning av bokningar mot alla rumets bokningar mot datan i db.
+        const overlapBookning = await Booking.findOne({
+            roomId: roomId,
+            startTime: { $lt: endTime },
+            endTime: { $gt: startTime },
+            //$ne = Not Equal kollar inte på ens egna bokning vid kontrol.
+            _id: { $ne: req.params.id }
+        })
+
+        if (overlapBookning) {
+            return res.status(400).json({ message: 'Booking overlaps with existing booking' });
+        }
+
+        //tillåter ägare och admin att uppdatera bokning annars stoppas.
+        if (req.user.role !== 'admin' && bookingToChange.userId.toString() !== req.user.id) {
+            return res.status(403).json({ message: 'Not authorized to update this booking' });
+        }
+
+        // allt ok – uppdatera och returnera den nya versionen uttan att uppdatera anväraren och rummet.
+        const updated = await Booking.findByIdAndUpdate(
+            req.params.id,
+            { roomId, startTime, endTime },
+            { new: true }
+        ).populate('roomId').populate('userId', 'userName');
+
+        return res.status(200).json(updated);
+    } catch (err) {
+        return res.status(500).json({ message: err.message });
+    }
+});
+
+router.delete('/:id', verifyJWTToken, async (req, res) => {
+    try {
+        const bookingToDelete = await Booking.findById(req.params.id);
+
+        //Kollar mycket av samma som PUT men raderar om alt är ok.
+        if (!bookingToDelete) {
+            return res.status(404).json({ message: 'Booking not found' });
+        }
+
+        if (req.user.role !== 'admin' && bookingToDelete.userId.toString() !== req.user.id) {
+            return res.status(403).json({ message: 'Not authorized to delete this booking' });
+        }
+
+        await Booking.findByIdAndDelete(req.params.id);
+        return res.status(200).json({ message: 'Booking deleted successfully' });
+
+    } catch (err) {
+        return res.status(500).json({ message: err.message });
+    }
+});
+
 export default router;
