@@ -1,6 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
-import logger from './middleware/logger.js';
+import logger from './config/logger.js';
+import requestLogger from './middleware/requestLogger.js';
 import connectToMongoDB from './config/db.js';
 import roomsRouter from './routes/rooms.js';
 import bookingsRouter from './routes/booking.js';
@@ -15,7 +16,7 @@ const app = express();
 
 //tar emot JSON-data i request body och gör den tillgänglig i req.body
 app.use(express.json());
-app.use(logger);
+app.use(requestLogger);
 
 app.use('/rooms', roomsRouter);
 app.use('/bookings', bookingsRouter);//skappa router
@@ -23,9 +24,12 @@ app.use('/bookings', bookingsRouter);//skappa router
 
 //Felhantering - fångar alla fel som uppstår i applikationen och skickar en generisk felmeddelande till klienten, samtidigt som det loggar det faktiska felet i serverns konsol. Detta hjälper till att hålla klienten informerad om att något gick fel utan att avslöja känslig information om servern.
 app.use((err, req, res, next) => {
-    console.error(`Ett fel uppstod: ${err.message}`);
-    res.status(500).send('Ett fel uppstod på servern');
-})
+    logger.error(`${err.status || 500} - ${err.message} - ${req.originalUrl} - ${req.method}`);
+    res.status(err.status || 500).json({
+        success: false,
+        message: 'Fel uppstog på server'
+    });
+});
 
 app.get('/', (req, res) => {
     res.send('Välkommen till min Express-server!');
