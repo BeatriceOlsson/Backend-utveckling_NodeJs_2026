@@ -2,25 +2,35 @@ import express from 'express';
 import Booking from '../models/booking.models.js';
 import Room from '../models/room.models.js';
 import { verifyJWTToken } from '../middleware/jwt.middleware.js';
+import client from '../config/redis.js';
 
 const router = express.Router();
 
 //Hämmtar bookningar, användare kan se alla och användare kan bara se sin egna
 router.get('/', verifyJWTToken, async (req, res) => {
-    if (req.user.role === 'admin') {
-        try {//.populate används för att hämta data från de länkande dokumenet
-            const bookings = await Booking.find().populate('roomId').populate('userId', 'userName');
-            return res.status(200).json(bookings);
-        } catch (err) {
-            return res.status(500).json({ message: err.message });
+    const chacheKey = req.user.role === 'admin' ? 'bookings:admin' : `bookings:user:${req.user.id}`;
+
+    try {//.populate används för att hämta data från de länkande dokumenet
+
+        const chachedData = await client.get(chacheKey);
+        if (chachedData) {
+            return res.json(JSON.parse(chachedData));
         }
-    } else {
-        try {
-            const booking = await Booking.find({ userId: req.user.id }).populate('roomId');
-            return res.status(200).json(booking);
-        } catch (err) {
-            return res.status(500).json({ message: err.message });
+
+        let bookings;
+        if (req.user.role === 'admin') {
+            bookings = await Booking.find().populate('roomId').populate('userId', 'userName');
+        } else {
+            bookings = await Booking.find({ userId: req.user.id }).populate('roomId');
         }
+
+        await client.setEx(chacheKey, 60, JSON.stringify(bookings));
+
+        return res.status(200).json(bookings)
+        
+    } catch (err) {
+        console.error('Fel vid hämtning av booking: ', err);
+        return res.status(500).json({ message: err.message });
     }
 });
 
@@ -65,6 +75,10 @@ router.post('/', verifyJWTToken, async (req, res) => {
         //Spara bookingen i databasen
         await booking.save();
         const savedBooking = await Booking.findById(booking._id).populate('roomId').populate('userId', 'userName');
+        
+        await client.del(`bookings:user:${req.user.id}`);
+        await client.del('bookings:admin');
+        
         return res.status(201).json(savedBooking);
 
     } catch (err) {
@@ -115,6 +129,9 @@ router.put('/:id', verifyJWTToken, async (req, res) => {
             { new: true }
         ).populate('roomId').populate('userId', 'userName');
 
+        await client.del(`bookings:user:${req.user.id}`);
+        await client.del('bookings:admin');
+
         return res.status(200).json(updated);
     } catch (err) {
         return res.status(500).json({ message: err.message });
@@ -135,6 +152,10 @@ router.delete('/:id', verifyJWTToken, async (req, res) => {
         }
 
         await Booking.findByIdAndDelete(req.params.id);
+        
+        await client.del(`bookings:user:${req.user.id}`);
+        await client.del('bookings:admin');
+
         return res.status(200).json({ message: 'Booking deleted successfully' });
 
     } catch (err) {

@@ -1,6 +1,6 @@
 import express from 'express';
 import User from '../models/users.models.js';
-import { skappaJWTToken, verifyJWTToken } from '../middleware/jwt.middleware.js';
+import { skappaJWTToken } from '../middleware/jwt.middleware.js';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -8,6 +8,10 @@ dotenv.config();
 const router = express.Router();
 
 router.post('/register', async (req, res) => {
+    
+    if (!req.body) {
+    return res.status(400).json({ message: 'Request body is missing' });
+}
     try {
         //tar ut värden från body och kollar att de har ett värde
         const {userName, password, role, adminKey} = req.body;
@@ -30,6 +34,7 @@ router.post('/register', async (req, res) => {
         }
         //kollar om användare med samma namn redan fins
         const existingUser = await User.findOne({ userName });
+        console.log('Existing user:', existingUser);
         if ( existingUser ) {
             return res.status(400).json({ message: 'User already exists' });
         }
@@ -41,10 +46,12 @@ router.post('/register', async (req, res) => {
         });
 
         await newUser.save();
+        console.log('User saved');
         return res.status(201).json({ message: 'User created successfully' });
     
     }catch (err) {
-        return res.status(500).json({ message: err.message });
+        console.error(err); 
+        return res.status(500).json({ error: err.message });
     }
 })
 
