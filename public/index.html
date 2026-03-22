@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inlog</title>
+</head>
+<body>
+    <h1>Inlog</h1>
+    <input id="userNamn" type="text">
+    <input id="password" type="password">
+    <button onclick="loggaIn()">Loga in</button>
+
+    <script src="https://cdn.socket.io/4.8.3/socket.io.min.js"></script>
+    <script>
+        const socket = io();
+        socket.emit('message', 'Inlogning av användare');
+
+        async function loggaIn() {
+            const userName = document.getElementById('userNamn').value;
+            const password = document.getElementById('password').value;
+
+            const loggingIn = await fetch ('/users/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({userName, password})
+            });
+            const data = await loggingIn.json();
+            if(loggingIn.ok) {
+                localStorage.setItem('token', data.token);
+                alert(`Inlogning lyckades ${data.token}`)
+            }
+        }
+    </script>
+</body>
+</html>

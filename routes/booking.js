@@ -78,6 +78,12 @@ router.post('/', verifyJWTToken, async (req, res) => {
         
         await client.del(`bookings:user:${req.user.id}`);
         await client.del('bookings:admin');
+
+        const io = req.app.get('io');
+        io.emit('bookingCreated', {
+          sucses: true,
+          message: savedBooking  
+        })
         
         return res.status(201).json(savedBooking);
 
@@ -132,6 +138,12 @@ router.put('/:id', verifyJWTToken, async (req, res) => {
         await client.del(`bookings:user:${req.user.id}`);
         await client.del('bookings:admin');
 
+        const io = req.app.get('io');
+        io.emit('bookingUpdated', {
+            sucses: true, 
+            message: updated
+        })
+
         return res.status(200).json(updated);
     } catch (err) {
         return res.status(500).json({ message: err.message });
@@ -155,6 +167,12 @@ router.delete('/:id', verifyJWTToken, async (req, res) => {
         
         await client.del(`bookings:user:${req.user.id}`);
         await client.del('bookings:admin');
+
+        const io = req.app.get('io');
+        io.emit('bookingDeleted', {
+            sucses: true,
+            message: 'Bokningen har raderats'
+        })
 
         return res.status(200).json({ message: 'Booking deleted successfully' });
 

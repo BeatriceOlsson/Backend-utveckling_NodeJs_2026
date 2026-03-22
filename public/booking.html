@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Bokning av rum</h1>
+
+    <div>
+        <input id="roomId" placeholder="Rum id">
+        <input id="startTime" type="datetime-local">
+        <input id="endTime" type="datetime-local">
+        <button onClick="bookingRoom()">Boka rum</button>
+        <button onclick="uppdateBooking()">Uppdatera bokning</button>
+    </div>
+
+    <ul id="userBookings"></ul>
+
+    <div id="notefickation"></div>
+
+    <script src="https://cdn.socket.io/4.8.3/socket.io.min.js"></script>
+    <script>
+        const socket = io();
+        socket.emit('message', 'Socket startar. Hej');
+        const feadback = document.getElementById('notefickation');
+        socket.on('chatMesa', (data) => {
+                feadback.innerText = data.message;
+            });
+
+        async function bookingRoom() {
+            const roomId = document.getElementById('roomId').value;
+            const startTime = document.getElementById('startTime').value;
+            const endTime = document.getElementById('endTime').value;
+
+            const savedToken = localStorage.getItem('token');
+
+            feadback.innerText= 'Bokning skickad....';
+            const bookingRom = await fetch ('/bookings', {
+                method: 'POST',
+                headers: {
+                    'Content-type': 'application/json',
+                    'Authorization' : `Bearer ${savedToken}`
+                },
+                body: JSON.stringify({roomId, startTime, endTime})
+            });
+
+            const data = await bookingRom.json();
+
+            if(bookingRom.ok) {
+                feadback.innerText= `Bokning har skappats: ${data}`;
+            } else {
+                feadback.innerText= `Bokningen kunde ej genomföras`;
+            }
+            console.log('Server: ', data)
+        }
+
+        async function fetchBookings() {
+            const savedToken = localStorage.getItem('token');
+            const listOfBooking = document.getElementById('userBookings');
+
+            feadback.innerText= 'Data hämtas....';
+            const gottBooking = await fetch ('/bookings', {
+                method: 'GET',
+                headers: {
+                    'Authorization' : `Bearer ${savedToken}`
+                },
+            });
+
+            const data = await gottBooking.json();
+            console.log(data);
+
+            if(!gottBooking.ok) {
+                throw new Error(data.message);
+            }
+
+            data.forEach(bokings => {
+                console.log('forEatch börjar');
+                const li = document.createElement('li');
+                li.innerText = `${bokings.roomId} = ${bokings.startTime} - ${bokings.endTime}`;
+                const deliteButton = document.createElement('button');
+                deliteButton.innerText = 'Avboka';
+                console.log('li har skappats');
+                deliteButton.addEventListener('click', () => {
+                    deleteOfBooking(bokings._id);
+                    console.log('knapp för delite skappats');
+                })
+                li.appendChild(deliteButton);
+                listOfBooking.appendChild(li);
+                console.log('saker visas');
+            });
+
+            feadback.innerText = '';
+        }
+        fetchBookings();
+        console.log('anrop till funtion');
+
+        async function uppdateBooking() {
+            const roomId = document.getElementById('roomId').value;
+            const startTime = document.getElementById('startTime').value;
+            const endTime = document.getElementById('endTime').value;
+
+            const savedToken = localStorage.getItem('token');
+
+            feadback.innerText = 'Bokning uppdateras...'
+            const uppdateBooking = await fetch(`/bookings/${roomId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-type': 'application/json',
+                    'Authorization' : `Bearer ${savedToken}`
+                },
+                body: JSON.stringify({roomId, startTime, endTime})
+            });
+
+            const data = await uppdateBooking.json();
+            feadback.innerText = 'Bokning uppdaterad';
+        }
+
+        async function deleteOfBooking(bookingId) {
+            console.log('Anrop till delete');
+            const savedToken = localStorage.getItem('token');
+
+            feadback.innerText ='Radering påbörjad ...';
+            const deleteBooking = await fetch(`/bookings/${bookingId}`,{
+                method: 'DELETE',
+                headers: {
+                    'Content-type': 'application/json',
+                    'Authorization' : `Bearer ${savedToken}`
+                },
+            })
+            feadback.innerText = 'Booking har tagits bort'
+            console.log('Booking har raderats');
+        }
+    </script>
+</body>
+</html>

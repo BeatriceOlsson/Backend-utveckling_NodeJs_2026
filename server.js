@@ -6,6 +6,10 @@ import connectToMongoDB from './config/db.js';
 import roomsRouter from './routes/rooms.js';
 import bookingsRouter from './routes/booking.js';
 import usersRouter from './routes/users.js'
+import { Server } from 'socket.io';
+import http from 'http';
+import { fileURLToPath } from 'url';
+import path from 'path';
 
 //läser in .env-filen och gör variablerna tillgängliga i process.env
 dotenv.config();
@@ -14,10 +18,18 @@ dotenv.config();
 connectToMongoDB();
 
 const app = express();
+const server = http.createServer(app);
+const io = new Server(server);
+app.set('io', io);
 
 //tar emot JSON-data i request body och gör den tillgänglig i req.body
 app.use(express.json());
 app.use(requestLogger);
+
+const __filname = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filname);
+
+app.use(express.static('public'));
 
 app.use('/rooms', roomsRouter);
 app.use('/bookings', bookingsRouter);//skappa router
@@ -34,7 +46,13 @@ app.use((err, req, res, next) => {
 
 console.log('Testar router-import:', typeof usersRouter); 
 app.get('/', (req, res) => {
-    res.send('Välkommen till min Express-server!');
+    res.sendFile(path.join(__dirname, 'public', 'index.html'))
+    //res.send('Välkommen till min Express-server!');
+});
+
+app.get('/booking', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'booking.html'))
+    //res.send('Välkommen till min Express-server!');
 });
 
 app.post('/test', (req, res) => {
@@ -42,8 +60,20 @@ app.post('/test', (req, res) => {
     res.json({ ok: true });
 });
 
+io.on('connection', (socket) => {
+    console.log('Användare anslöt sig; ', socket.id);
+    
+    socket.on('message', (msg) => {
+        console.log('Medelande från användare: ', msg);
+        socket.emit('serverMesage: ', `Server säger: ${msg}`);
+    });
+    socket.on('disconnect', () => {
+        console.log('Användare kopplade ifrån: ', socket.id)
+    });
+});
+
 //startar servern på den port som anges i .env-filen eller på port 3000 om ingen port anges
 const port = process.env.PORT || 3000;
-app.listen(port, () => {
+server.listen(port, () => {
     console.log(`Servern körs på port ${port}`);
 })
