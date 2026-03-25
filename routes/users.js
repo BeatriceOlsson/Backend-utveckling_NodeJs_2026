@@ -34,7 +34,7 @@ router.post('/register', async (req, res) => {
         }
         //kollar om användare med samma namn redan fins
         const existingUser = await User.findOne({ userName });
-        console.log('Existing user:', existingUser);
+        
         if ( existingUser ) {
             return res.status(400).json({ message: 'User already exists' });
         }

@@ -7,9 +7,8 @@ const client = createClient();
 client.on('error', (err) =>
 console.error('Redis-fel: ', err));
 
+//await client.connect() skappar error om inte länkad till container som kör.
 await client.connect();
 console.log('Redis connected');
-
-// Ta bort await connect() då fel rullade och kunde inte gå vidare. Kan kolla på längra fram
 
 export default client;

@@ -13,6 +13,7 @@
 
     <script src="https://cdn.socket.io/4.8.3/socket.io.min.js"></script>
     <script>
+        //Kopplar till server för medelanden
         const socket = io();
         socket.emit('message', 'Inlogning av användare');
 
@@ -20,6 +21,7 @@
             const userName = document.getElementById('userNamn').value;
             const password = document.getElementById('password').value;
 
+            //Skickar data till önskad del i server och datan för i body
             const loggingIn = await fetch ('/users/login', {
                 method: 'POST',
                 headers: {
@@ -30,7 +32,7 @@
             const data = await loggingIn.json();
             if(loggingIn.ok) {
                 localStorage.setItem('token', data.token);
-                alert(`Inlogning lyckades ${data.token}`)
+                alert(`Inlogning lyckades`)
             }
         }
     </script>
