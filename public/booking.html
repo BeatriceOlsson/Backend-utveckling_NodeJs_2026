@@ -79,6 +79,8 @@
             console.log(data);
 
             if(!gottBooking.ok) {
+                console.log('serven ger fedback: ', data.message);
+                feadback.innerText = "Sessionen har gått ut, vänligen logga in igen.";
                 throw new Error(data.message);
             }
 

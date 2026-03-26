@@ -42,11 +42,14 @@
                 },
                 body: JSON.stringify({userName, password})
             });
+
             const data = await loggingIn.json();
-            /*if(loggingIn.ok) {
-                localStorage.setItem('token', data.token);
-                alert(`Inlogning lyckades`)
-            }*/
+            if (data.token) {
+                localStorage.setItem('token', data.token); // <-- Spara token
+                feadback.innerText = "Inloggning lyckades!";
+            } else {
+                feadback.innerText = data.message || "Fel vid inloggning";
+            }
         }
     </script>
 </body>
