@@ -3,30 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Bokning</title>
+    <style>
+        body {display: flex; justify-content: center; align-items: center; background-color: #091413; margin-top: 50px;}
+        h1 {color: #B0E4CC;}
+    </style>
 </head>
 <body>
-    <h1>Bokning av rum</h1>
+    <div style="display:flex; flex-direction: column; align-items: center; background-color: #408A71; width: 300px; border: 15px solid #285A48; border-radius: 5px">
+        <h1>Bokning av rum</h1>
 
-    <div>
-        <input id="roomId" placeholder="Rum id">
-        <input id="startTime" type="datetime-local">
-        <input id="endTime" type="datetime-local">
-        <button onClick="bookingRoom()">Boka rum</button>
+        <div style="display:flex; flex-direction: column; align-items: center;">
+            <input id="roomId" placeholder="Rum id">
+            <input id="startTime" type="datetime-local">
+            <input id="endTime" type="datetime-local">
+            <button onClick="bookingRoom()">Boka rum</button>
+        </div>
+
+        <ul style="margin-bottom: 10px; color: #B0E4CC;" id="userBookings"></ul>
+
+        <div style="margin-bottom: 10px; color: #B0E4CC;" id="notefickation"></div>
     </div>
-
-    <ul id="userBookings"></ul>
-
-    <div id="notefickation"></div>
-
     <script src="https://cdn.socket.io/4.8.3/socket.io.min.js"></script>
     <script>
         const socket = io();
-        socket.emit('message', 'Socket startar. Hej');
+        socket.emit('message', 'Hej och välkommen');
         const feadback = document.getElementById('notefickation');
-        socket.on('chatMesa', (data) => {
-                feadback.innerText = data.message;
+        socket.on('serverMessage', (data) => {
+                feadback.innerText = data;
             });
+        socket.on('bookingCreated', (data) => {
+            fetchBookings();
+            const roomName = data.message.roomId.name;
+            feadback.innerText = `Bokning har skappats: ${roomName}`;
+        });
+        socket.on('bookingDeleted', (data) => {
+            fetchBookings();
+            feadback.innerText = data.message;
+        });
 
         async function bookingRoom() {
             const roomId = document.getElementById('roomId').value;
@@ -47,18 +61,13 @@
 
             const data = await bookingRom.json();
 
-            if(bookingRom.ok) {
-                feadback.innerText= `Bokning har skappats: ${data}`;
-            } else {
-                feadback.innerText= `Bokningen kunde ej genomföras`;
-            }
         }
 
         async function fetchBookings() {
             const savedToken = localStorage.getItem('token');
             const listOfBooking = document.getElementById('userBookings');
+            listOfBooking.innerHTML = '';
 
-            feadback.innerText= 'Data hämtas....';
             const gottBooking = await fetch ('/bookings', {
                 method: 'GET',
                 headers: {
@@ -67,6 +76,7 @@
             });
 
             const data = await gottBooking.json();
+            console.log(data);
 
             if(!gottBooking.ok) {
                 throw new Error(data.message);
@@ -74,7 +84,7 @@
 
             data.forEach(bokings => {
                 const li = document.createElement('li');
-                li.innerText = `${bokings.roomId} = ${bokings.startTime} - ${bokings.endTime}`;
+                li.innerText = `${bokings.roomId.name || bokings.romId._id} = ${bokings.startTime} - ${bokings.endTime}`;
                 const deliteButton = document.createElement('button');
                 deliteButton.innerText = 'Avboka';
             
@@ -84,10 +94,8 @@
 
                 li.appendChild(deliteButton);
                 listOfBooking.appendChild(li);
-                
             });
 
-            feadback.innerText = '';
         }
         fetchBookings();
 
@@ -102,7 +110,6 @@
                     'Authorization' : `Bearer ${savedToken}`
                 },
             })
-            feadback.innerText = 'Booking har tagits bort'
         }
     </script>
 </body>

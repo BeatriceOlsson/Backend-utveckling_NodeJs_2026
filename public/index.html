@@ -4,18 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inlog</title>
+    <style>
+        body {display: flex; justify-content: center; align-items: center; background-color: #091413; margin-top: 50px;}
+        h1 {color: #B0E4CC;}
+    </style>
 </head>
 <body>
-    <h1>Inlog</h1>
-    <input id="userNamn" type="text">
-    <input id="password" type="password">
-    <button onclick="loggaIn()">Loga in</button>
+    <div style="display:flex; flex-direction: column; align-items: center; background-color: #408A71; width: 300px; border: 15px solid #285A48; border-radius: 5px">
+        <h1>Inlog</h1>
+        <input style="margin-bottom: 10px;" id="userNamn" type="text">
+        <input style="margin-bottom: 10px;" id="password" type="password">
+        <button style="margin-bottom: 15px; border-radius: 5px; background-color: #285A48; color: #B0E4CC;" onclick="loggaIn()">Loga in</button>
+        <div style="margin-bottom: 10px; color: #B0E4CC;" id="notefickation"></div>
+    </div>
 
     <script src="https://cdn.socket.io/4.8.3/socket.io.min.js"></script>
     <script>
         //Kopplar till server för medelanden
         const socket = io();
         socket.emit('message', 'Inlogning av användare');
+        const feadback = document.getElementById('notefickation');
+
+        socket.on('userLogin', (data) => {
+            console.log(data);
+            feadback.innerText = data.message;
+        });
 
         async function loggaIn() {
             const userName = document.getElementById('userNamn').value;
@@ -30,10 +43,10 @@
                 body: JSON.stringify({userName, password})
             });
             const data = await loggingIn.json();
-            if(loggingIn.ok) {
+            /*if(loggingIn.ok) {
                 localStorage.setItem('token', data.token);
                 alert(`Inlogning lyckades`)
-            }
+            }*/
         }
     </script>
 </body>

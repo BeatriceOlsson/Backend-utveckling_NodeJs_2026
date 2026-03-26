@@ -81,7 +81,7 @@ router.post('/', verifyJWTToken, async (req, res) => {
 
         const io = req.app.get('io');
         io.emit('bookingCreated', {
-          sucses: true,
+          sucsess: true,
           message: savedBooking  
         })
         
@@ -140,7 +140,7 @@ router.put('/:id', verifyJWTToken, async (req, res) => {
 
         const io = req.app.get('io');
         io.emit('bookingUpdated', {
-            sucses: true, 
+            sucsess: true, 
             message: updated
         })
 
@@ -170,7 +170,7 @@ router.delete('/:id', verifyJWTToken, async (req, res) => {
 
         const io = req.app.get('io');
         io.emit('bookingDeleted', {
-            sucses: true,
+            sucsess: true,
             message: 'Bokningen har raderats'
         })
 

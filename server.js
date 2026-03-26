@@ -44,7 +44,6 @@ app.use((err, req, res, next) => {
     });
 });
 
-console.log('Testar router-import:', typeof usersRouter); 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'))
     //res.send('Välkommen till min Express-server!');
@@ -65,7 +64,7 @@ io.on('connection', (socket) => {
     
     socket.on('message', (msg) => {
         console.log('Medelande från användare: ', msg);
-        socket.emit('serverMesage: ', `Server säger: ${msg}`);
+        socket.emit('serverMessage', `Server säger: ${msg}`);
     });
     socket.on('disconnect', () => {
         console.log('Användare kopplade ifrån: ', socket.id)

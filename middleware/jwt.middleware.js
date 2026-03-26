@@ -12,7 +12,7 @@ function skappaJWTToken(user) {
         id: user._id,
         role: user.role
     }
-    const token = jwt.sign(payload, secretKey, { expiresIn: '2h' });
+    const token = jwt.sign(payload, secretKey, { expiresIn: '5h' });
     return token;
 }
 

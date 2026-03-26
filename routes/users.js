@@ -74,6 +74,13 @@ router.post('/login', async (req, res) => {
         if (!passwordMatch) return res.status(400).json({ message: 'Invalid credentials' });
 
         const token = skappaJWTToken(user);
+
+        const io = req.app.get('io');
+        io.emit('userLogin', {
+            sucsess: true,
+            message: 'Användare har logat in'
+        });
+        
         return res.status(200).json({ token });
     } catch (err) {
         return res.status(500).json({ message: err.message });
