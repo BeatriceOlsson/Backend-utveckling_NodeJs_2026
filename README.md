@@ -1,8 +1,10 @@
-Skoluppgift: Uppgift för Backend-utveckling NodeJs
-Projektet skapades och utvecklades för kursen Backend-utveckling NodeJs enligt projektkraven givet för slutprojekt. En plattform för hantering av bokningssystem för arbetsrum/platser eller konferensrum med olika tillgänglighet beroende på användare och admin.
+## Skoluppgift: Uppgift för Backend-utveckling NodeJs
+Projektet skapades och utvecklades för kursen Backend-utveckling NodeJs enligt projektkraven givet för slutprojekt. 
+
+En plattform för hantering av bokningssystem för arbetsrum/platser eller konferensrum med olika tillgänglighet beroende på användare och admin.
 
 
-Funktioner enligt projektkrav:
+## Funktioner enligt projektkrav:
 -Registrering och inloggning av användare/admin.
 -Autentisering med JWT.
 -Autentisering av roller för vissa funktioner.
@@ -12,7 +14,7 @@ Funktioner enligt projektkrav:
 -Enkel HTML för inloggningsfunktion samt ny bokning och att kunna avboka.
 
 
-Använda tekniker i projektet:
+## Använda tekniker i projektet:
 -Node.js
 -Express.js
 -Mongo DB Atlas
@@ -22,7 +24,7 @@ Använda tekniker i projektet:
 -WebSocket
 
 
-Projektstruktur
+## Projektstruktur
 -'server': huvud filen som startar applikationen och kopplar ihop alla delar.
 -'config': konfigurera för databas, loggar och redis.
 -'middleware': JWT autentiserings logik, loggning.
@@ -31,16 +33,17 @@ Projektstruktur
 -'routes': API-rutter för “User, Room och Booking.”
 
 
-Instalation:
+## Instalation:
+```
 1.Klona repot
 2.Installera dependencies med 'npm install'.
 3.Skapa '.env'-fil.
 4.Addera nödvändiga miljövariabler nycklar.
 5.Starta projektet med 'npm run dev’.
 6.Gå till 'http://localhost:4000/' för inloggning och 'http://localhost:4000/booking' för bokning i valfri browser.
+```
 
-
-API-dokumentation
+## API-dokumentation
 Users
 POST'/users/register':
 Skapar användare om ej admin-nyckel ges. Kollar längd och att användare med samma namn inte finns registrerade innan ny användare skapas.
