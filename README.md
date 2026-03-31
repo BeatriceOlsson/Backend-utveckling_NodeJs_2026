@@ -2,7 +2,7 @@
 Projektet skapades och utvecklades för kursen Backend-utveckling NodeJs enligt projektkraven givet för slutprojekt. 
 
 En plattform för hantering av bokningssystem för arbetsrum/platser eller konferensrum med olika tillgänglighet beroende på användare och admin.
-
+<br />
 
 ## Funktioner enligt projektkrav:
 - Registrering och inloggning av användare/admin.
@@ -12,7 +12,7 @@ En plattform för hantering av bokningssystem för arbetsrum/platser eller konfe
 - Kontroll av "tids-konflikter" vid bokning.
 - Realtids notefickationer med Socket.io
 - Enkel HTML för inloggningsfunktion samt ny bokning och att kunna avboka.
-
+<br />
 
 ## Använda tekniker i projektet:
 - Node.js
@@ -22,7 +22,7 @@ En plattform för hantering av bokningssystem för arbetsrum/platser eller konfe
 - bcrypt
 - Redis
 - WebSocket
-
+<br />
 
 ## Projektstruktur
 - 'server': huvud filen som startar applikationen och kopplar ihop alla delar.
@@ -31,7 +31,7 @@ En plattform för hantering av bokningssystem för arbetsrum/platser eller konfe
 - 'models': data modeler för Mongo DB för “User, Room och Booking.”
 - 'public': enkel HTML för inloggning, skapa bokning och ta bort bokning.
 - 'routes': API-rutter för “User, Room och Booking.”
-
+<br />
 
 ## Instalation:
 ```
@@ -42,9 +42,12 @@ En plattform för hantering av bokningssystem för arbetsrum/platser eller konfe
 5.Starta projektet med 'npm run dev’.
 6.Gå till 'http://localhost:4000/' för inloggning och 'http://localhost:4000/booking' för bokning i valfri browser.
 ```
+<br />
 
 ## API-dokumentation
-### Users  
+<br />
+### Users
+<br />
 POST'/users/register':  
 Skapar användare om ej admin-nyckel ges. Kollar längd och att användare med samma namn inte finns registrerade innan ny användare skapas.  
 Kräver JWT: Nej.  
@@ -54,7 +57,7 @@ Data som krävs i body: {
       'password': 'Lösenord',  
       'adminKey':'valfritt om admin rol skall ges'  
 }  
-
+<br />
 
 POST'/users/login':  
 Tar användarnamn och lösenord och kollar att användare med matchande användarnamn existerar samt att angivna lösenord matchar de sparade lösenord i db. Om inget fel upptäcks loggar användare in och en 'token' ges.  
@@ -64,9 +67,10 @@ Data som krävs i body: {
       'userNamne': 'Användar namn',  
       'password': 'lösenord'  
 }  
-
+<br />
 
 ### Booking  
+<br />
 GET'/bookings/':  
 Hämtar bokningar som användare har där den kollar om vilka bokningar som finns kopplat till användarens id. Skickar datan på dessa bokningar tillsammans med att spara en chache med datan. Om användare är admin visas alla bokningar och chase skapas.  
 Kräver JWT: Ja.  
@@ -74,7 +78,7 @@ Admin: Admin kan se alla bokningar anmvändare har skapat.
 Data som krävs i header: {  
       "Authorization": "Bearer <token>"  
 }  
-
+<br />
 
 POST'/bookings/':  
 Skapar en bokning om all data finns tillgänglig, att rummet finns, att starttiden är innan sluttid samt att angiven tid inte överlappar med en existerande tid av alla bokningar för det rummet. Om inget problem framkommer sparas bokningen och realtid information skickas som kan visas i realtime för användare.  
@@ -85,7 +89,7 @@ Data som krävs i body: {
       'startTime': 'Start datum',  
       'endTime': 'Slut datum'  
 }  
-
+<br />
 
 PUT'/bookings/:id'  
 Uppdaterar en existerande bokning gjord av användaren. Kontrollerar att den finns, att all data som behövs finns, att starten är tidigare än slutet samt att den nya angivna tiden inte överlappar med existerande bokad tid som inte är din egen. Admin kan uppdatera alla bokningar som fyller kraven ovan.  
@@ -96,7 +100,7 @@ Data som krävs i body: {
       'startTime': 'Start datum',  
       'endTime': 'Slut datum'  
 }  
-
+<br />
 
 DELETE'/bookings/:id'  
 Tar bort en skapad bokning från systemet och kontrollerar bara att bokningen finns. Admin kan ta bort alla bokningar som finns i systemet.  
@@ -105,15 +109,16 @@ Admin: Ja. Kan radera alla bokningar.
 Data som krävs i body: {  
       'roomId': 'Rummets id'  
 }  
-
+<br />
 
 ### Rooms  
+<br />
 GET'/rooms/'  
 Hämtar alla rum som finns i systemet.  
 Kräver JWT: Nej.  
 Admin: Nej.  
 Data som krävs i body: Kräver ingen data.  
-
+<br />
 
 POST'/rooms/'  
 Skapar ett rum i systemet för att kunna bokas. Kräver verifiering av admin då funktionen inte kan användas av vanliga användare.  
@@ -124,7 +129,7 @@ Data som krävs i body: {
       'capacity': 'numer av personer',  
       'type': 'workspace/conference'  
 }  
-
+<br />
 
 PUT'/rooms/:id'  
 Uppdaterar existerande rum. Hämtar och kontrollerar att rummet finns innan går vidare och uppdaterar det. Kräver verifiering av admin då funktionen inte kan användas av vanliga användare.  
@@ -135,7 +140,7 @@ Data som krävs i body: {
       'capacity': 'numer av personer',  
       'type': 'workspace/conference'  
 }  
-
+<br />
 
 DELETE'/rooms/:id'  
 Raderar existerande rum från systemet och kontrollerar bara att rummet existerar. Kräver verifiering av admin då funktionen inte kan användas av vanliga användare.  
@@ -144,3 +149,4 @@ Admin: Ja.
 Data som krävs i body: {  
       'roomId': 'Rummets id'  
 }  
+<br />
