@@ -45,10 +45,10 @@ En plattform för hantering av bokningssystem för arbetsrum/platser eller konfe
 <br />
 
 ## API-dokumentation
-<br />
 
 ### Users
 <br />
+
 POST'/users/register':  
 Skapar användare om ej admin-nyckel ges. Kollar längd och att användare med samma namn inte finns registrerade innan ny användare skapas.  
 Kräver JWT: Nej.  
@@ -72,6 +72,7 @@ Data som krävs i body: {
 
 ### Booking  
 <br />
+
 GET'/bookings/':  
 Hämtar bokningar som användare har där den kollar om vilka bokningar som finns kopplat till användarens id. Skickar datan på dessa bokningar tillsammans med att spara en chache med datan. Om användare är admin visas alla bokningar och chase skapas.  
 Kräver JWT: Ja.  
@@ -114,6 +115,7 @@ Data som krävs i body: {
 
 ### Rooms  
 <br />
+
 GET'/rooms/'  
 Hämtar alla rum som finns i systemet.  
 Kräver JWT: Nej.  
