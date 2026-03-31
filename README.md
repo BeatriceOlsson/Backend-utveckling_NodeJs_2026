@@ -5,32 +5,32 @@ En plattform för hantering av bokningssystem för arbetsrum/platser eller konfe
 
 
 ## Funktioner enligt projektkrav:
--Registrering och inloggning av användare/admin.
--Autentisering med JWT.
--Autentisering av roller för vissa funktioner.
--CRUD-funktioner för hantering av rum och bokningar.
--Kontroll av "tids-konflikter" vid bokning.
--Realtids notefickationer med Socket.io
--Enkel HTML för inloggningsfunktion samt ny bokning och att kunna avboka.
+- Registrering och inloggning av användare/admin.
+- Autentisering med JWT.
+- Autentisering av roller för vissa funktioner.
+- CRUD-funktioner för hantering av rum och bokningar.
+- Kontroll av "tids-konflikter" vid bokning.
+- Realtids notefickationer med Socket.io
+- Enkel HTML för inloggningsfunktion samt ny bokning och att kunna avboka.
 
 
 ## Använda tekniker i projektet:
--Node.js
--Express.js
--Mongo DB Atlas
--JWT
--bcrypt
--Redis
--WebSocket
+- Node.js
+- Express.js
+- Mongo DB Atlas
+- JWT
+- bcrypt
+- Redis
+- WebSocket
 
 
 ## Projektstruktur
--'server': huvud filen som startar applikationen och kopplar ihop alla delar.
--'config': konfigurera för databas, loggar och redis.
--'middleware': JWT autentiserings logik, loggning.
--'models': data modeler för Mongo DB för “User, Room och Booking.”
--'public': enkel HTML för inloggning, skapa bokning och ta bort bokning.
--'routes': API-rutter för “User, Room och Booking.”
+- 'server': huvud filen som startar applikationen och kopplar ihop alla delar.
+- 'config': konfigurera för databas, loggar och redis.
+- 'middleware': JWT autentiserings logik, loggning.
+- 'models': data modeler för Mongo DB för “User, Room och Booking.”
+- 'public': enkel HTML för inloggning, skapa bokning och ta bort bokning.
+- 'routes': API-rutter för “User, Room och Booking.”
 
 
 ## Instalation:
@@ -44,16 +44,16 @@ En plattform för hantering av bokningssystem för arbetsrum/platser eller konfe
 ```
 
 ## API-dokumentation
-Users
-POST'/users/register':
-Skapar användare om ej admin-nyckel ges. Kollar längd och att användare med samma namn inte finns registrerade innan ny användare skapas.
-Kräver JWT: Nej.
-Admin: Nej.
-Data som krävs i body: {
-      'userNamne': 'Användar namn',
-      'password': 'Lösenord',
-      'adminKey':'valfritt om admin rol skall ges'
-}
+Users  
+POST'/users/register':  
+Skapar användare om ej admin-nyckel ges. Kollar längd och att användare med samma namn inte finns registrerade innan ny användare skapas.  
+Kräver JWT: Nej.  
+Admin: Nej.  
+Data som krävs i body: {  
+      'userNamne': 'Användar namn',  
+      'password': 'Lösenord',  
+      'adminKey':'valfritt om admin rol skall ges'  
+}  
 
 
 POST'/users/login':
