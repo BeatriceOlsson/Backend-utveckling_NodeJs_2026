@@ -1,6 +1,6 @@
-import dontenv from 'dotenv';
+import dotenv from 'dotenv';
 import { createClient } from "redis";
-dontenv.config();
+dotenv.config();
 const client = createClient({
     url: process.env.REDIS_URL
 });
